@@ -10,7 +10,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import ru.brombin.image_service.dto.DeleteImageRequest;
 import ru.brombin.image_service.facade.ImageFacade;
-import ru.brombin.image_service.security.JwtAuthenticationService;
 import ru.brombin.image_service.util.exception.FileStorageException;
 import org.springframework.kafka.support.Acknowledgment;
 
@@ -20,7 +19,6 @@ import org.springframework.kafka.support.Acknowledgment;
 @FieldDefaults(level= AccessLevel.PRIVATE, makeFinal=true)
 public class KafkaImageConsumerImpl implements KafkaImageConsumer {
     ImageFacade imageFacade;
-    JwtAuthenticationService jwtAuthenticationService;
 
     @Override
     @KafkaListener(
@@ -29,17 +27,8 @@ public class KafkaImageConsumerImpl implements KafkaImageConsumer {
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void consumeDeleteImageRequest(ConsumerRecord<String, DeleteImageRequest> record, Acknowledgment ack) {
-        jwtAuthenticationService.authenticateJwt(extractJwtToken(record));
         DeleteImageRequest deleteImageRequest = record.value();
         processAndDeleteImage(deleteImageRequest);
-    }
-
-    private String extractJwtToken(ConsumerRecord<String, DeleteImageRequest> record) {
-        Header authHeader = record.headers().lastHeader("Authorization");
-        if (authHeader == null) {
-            throw new SecurityException("JWT токен отсутствует в заголовке Kafka сообщения.");
-        }
-        return new String(authHeader.value());
     }
 
     private void processAndDeleteImage(DeleteImageRequest deleteImageRequest) {
