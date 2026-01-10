@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   image-postgres:
-    image: postgres:latest
+    image: postgres:17
     container_name: image-postgres
     environment:
       POSTGRES_USER: postgres
@@ -42,7 +42,7 @@ services:
 
   image-service:
     build:
-      context: ../../SupportDesk-ImageService
+      context: ../../SupportDesk-ImageService-VirtualThreads
       dockerfile: Dockerfile
     container_name: image-service
     ports:
@@ -57,6 +57,7 @@ services:
 volumes:
   image_postgres_data:
   minio_data:
+  kafka_data:
 
 networks:
   support-network:
