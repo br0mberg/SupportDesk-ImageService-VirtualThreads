@@ -8,7 +8,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +25,6 @@ public class ImageController {
     ImageFacade imageFacade;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST', 'USER')")
     public ResponseEntity<Image> uploadImage(
             @Valid @ModelAttribute ImageDto imageDto,
             @RequestParam("file") MultipartFile file) {
@@ -36,7 +34,6 @@ public class ImageController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     public ResponseEntity<InputStreamResource> downloadImage(@PathVariable Long id) {
         ImageDtoMessage imageDtoMessage = imageFacade.getImageDtoMessage(id);
         ImageDto imageDto = imageDtoMessage.imageDto();
@@ -54,7 +51,6 @@ public class ImageController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
         imageFacade.deleteImage(id);
         return ResponseEntity.noContent().build();
